@@ -1,22 +1,31 @@
+import { getGifsByQuery } from "./gifs/actions/get-gifs-by-query.action";
 import GifList from "./gifs/components/GifList";
 import PreviousSearch from "./gifs/components/PreviousSearch";
-import { mockGifs } from "./mock-data/gifs.mock";
+import { mockGifs, type Gif } from "./mock-data/gifs.mock";
 import { CustomHeader } from "./shared/components/CustomHeader";
 import SearchBar from "./shared/components/SearchBar";
 import { useState } from "react";
 
 export const GifsApp = () => {
-  const [previousTerms, setpreviousTerms] = useState(["prueba"]);
+  
+  const [gifs, setGifs] = useState <Gif[]>([]);
+
+  const [previousTerms, setpreviousTerms] = useState<string[]>([]);
 
   const handleTermClicked = (term: string = '') => {
     console.log({ term });
   };
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
     query.toLowerCase();
     if (query.length === 0) return;
     if ( previousTerms.includes(query) ) return;
     setpreviousTerms( [query, ...previousTerms].slice(0,7 ) );
+
+    const gifs = await getGifsByQuery(query);
+
+    setGifs(gifs)
+    
     
   };
 
@@ -43,7 +52,7 @@ export const GifsApp = () => {
       />
 
       {/* GIFS */}
-      <GifList gifs={mockGifs} />
+      <GifList gifs={gifs} />
     </>
   );
 };
